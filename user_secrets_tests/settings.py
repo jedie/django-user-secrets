@@ -40,6 +40,12 @@ INSTALLED_APPS = (
     'user_secrets_tests.apps.UserSecretsTestAppConfig',
 )
 
+AUTHENTICATION_BACKENDS = [
+    'user_secrets.auth_backend.UserSecretsAuthBackend',  # Must be at first
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+
 MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
