@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib.auth import get_user_model, user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 
@@ -23,8 +23,9 @@ def user_logged_in_callback(*, sender, request, user, **kwargs):
 
 @receiver(user_login_failed)
 def user_login_failed_callback(*, sender, credentials, request, **kwargs):
-    log.debug('User login failed -> set request.temp_token = None')
-    request.temp_token = None
+    log.debug('User login failed -> set request.fernet = None')
+    if request:
+        request.fernet = None
     print(sender, credentials, request)
 
 
