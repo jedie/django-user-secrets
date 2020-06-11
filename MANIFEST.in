@@ -1,0 +1,23 @@
+include MANIFEST.in
+include AUTHORS
+include LICENSE
+include README.creole
+include tox.ini
+include pytest.ini
+
+recursive-include user_secrets *.py
+recursive-include user_secrets/templates *.html *.css *.js
+recursive-include user_secrets_tests *.py
+recursive-include user_secrets_tests *.py
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude .tox *
+
+include requirements-dev.txt
+include requirements-test.txt
+
+recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+
+recursive-exclude user_secrets_tests/media *
+recursive-exclude user_secrets_tests/static *

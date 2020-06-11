@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "django-user-secrets"
+version = "0.0.1"
+description = "Store user secrets encrypted into database."
+
+# Will be generated from README.creole with: "poetry run update_rst_readme"
+readme="README.rst"
+
+license = "GPL-3.0-or-later"
+authors = ["Jens Diemer <django-user-secrets@jensdiemer.de>"]
+homepage = "https://github.com/jedie/django-user-secrets/"
+keywords=["django", "helpers"]
+packages = [
+    { include = "user_secrets" },
+    { include = "user_secrets_tests" },
+]
+classifiers = [
+    # http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    "Development Status :: 1 - Planning",
+#    "Development Status :: 2 - Pre-Alpha",
+#    "Development Status :: 3 - Alpha",
+#    "Development Status :: 4 - Beta",
+#    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+django = "*"
+django-tools = "*"
+
+[tool.poetry.dev-dependencies]
+poetry-publish = "*"  # https://github.com/jedie/poetry-publish
+django-debug-toolbar = "*"
+tox = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-cov = "*"
+isort = "*"
+flake8 = "*"
+flynt = "*"
+autopep8 = "*"
+pyupgrade = "*"
+colorlog = "*"
+
+[tool.poetry.scripts]
+update_rst_readme = "user_secrets.publish:update_readme"
+publish = "user_secrets.publish:publish"
+dev_server = "manage:start_test_server"
+
+[tool.autopep8]
+# https://github.com/hhatto/autopep8#pyprojecttoml
+max_line_length = 120
+exclude = "*/migrations/*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
