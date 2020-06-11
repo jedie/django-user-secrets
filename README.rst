@@ -1,0 +1,42 @@
+===================
+django-user-secrets
+===================
+
+Store user secrets encrypted into database.
+
+Current project state: planing
+
+Licence: GPL v3 or above
+
+--------
+the idea
+--------
+
+Store a user's secrets in the database encrypted with his password.
+
+Only the user can decrypt the stored data. His password is used for encryption and decryption. This password is only transmitted in plain text when logging in (Django itself only saves a salted hash of the password).
+
+The intermediate-user-secret is decrypted and stored with the clear text password in RAM after successful login. All user secrets will be encrypted and decrypted with his intermediate-user-secret.
+
+Limitations and/or facts:
+
+* Only the same user can decrypt his own data.
+
+* The decrypted data can only be used during an active session.
+
+* A intermediate-user-secret is used, so that a password can be changed without losing the encrypted data.
+
+Alternative/Related projects:
+=============================
+
+* `https://github.com/erikvw/django-crypto-fields <https://github.com/erikvw/django-crypto-fields>`_
+
+* `https://github.com/incuna/django-pgcrypto-fields <https://github.com/incuna/django-pgcrypto-fields>`_
+
+* `https://github.com/georgemarshall/django-cryptography <https://github.com/georgemarshall/django-cryptography>`_
+
+(Random order: No prioritization)
+
+------------
+
+``Note: this file is generated from README.creole 2020-06-11 19:44:56 with "python-creole"``
