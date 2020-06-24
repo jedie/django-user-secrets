@@ -1,11 +1,6 @@
-import base64
 import logging
 
-from cryptography.fernet import Fernet
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from django.conf import settings
+from user_secrets.crypto import fernet_from_password
 
 
 log = logging.getLogger(__name__)
@@ -19,15 +14,7 @@ class UserSecretsAuthBackend:
 
     def authenticate(self, request, username=None, password=None):
         if password and request:
-            kdf = PBKDF2HMAC(
-                algorithm=hashes.SHA256(),
-                length=32,
-                salt=(settings.SECRET_KEY).encode(),
-                iterations=10000,
-                backend=default_backend()
-            )
-            key = base64.urlsafe_b64encode(kdf.derive((password).encode()))
-            fernet = Fernet(key)
+            fernet = fernet_from_password(raw_password=password)
             request.fernet = fernet
             log.debug(f'Add request.fernet="{fernet}"')
 
