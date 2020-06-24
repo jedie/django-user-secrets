@@ -38,7 +38,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6"
 django = "*"
-cryptography = "*"
+cryptography = "*" # https://github.com/pyca/cryptography
 django-tools = "*"
 
 [tool.poetry.dev-dependencies]

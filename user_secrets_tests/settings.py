@@ -23,8 +23,6 @@ DATABASES = {
     }
 }
 
-CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'unique-snowflake'}}
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +37,22 @@ INSTALLED_APPS = (
     # The Test app:
     'user_secrets_tests.apps.UserSecretsTestAppConfig',
 )
+
+AUTH_USER_MODEL = 'user_secrets.UserSecrets'
+AUTHENTICATION_BACKENDS = [
+    'user_secrets.auth_backend.UserSecretsAuthBackend',  # Must be at first
+    'django.contrib.auth.backends.ModelBackend'
+]
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'default',
+    },
+    'user_secrets': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'user_secrets',
+    }
+}
 
 MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
