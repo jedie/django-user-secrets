@@ -12,6 +12,7 @@ print('Use settings:', __file__)
 BASE_DIR = Path(__file__).parent
 
 DEBUG = True
+INTERNAL_IPS = ['127.0.0.1']
 
 SECRET_KEY = 'Unittests'
 ALLOWED_HOSTS = ['*']  # Allow any domain/subdomain
@@ -36,6 +37,8 @@ INSTALLED_APPS = (
 
     # The Test app:
     'user_secrets_tests.apps.UserSecretsTestAppConfig',
+
+    'debug_toolbar',
 )
 
 AUTH_USER_MODEL = 'user_secrets.UserSecrets'
