@@ -7,7 +7,7 @@ from django.test import RequestFactory, TestCase
 from user_secrets.caches import get_user_itermediate_secret
 from user_secrets.crypto import Cryptor, secret2fernet_key, user_decrypt, user_encrypt
 from user_secrets.exceptions import NoUserKeyError
-from user_secrets.user_key import del_user_key, get_user_key, _KEY_STORAGE, set_user_key
+from user_secrets.user_key import _KEY_STORAGE, del_user_key, get_user_key, set_user_key
 
 
 UserModel = get_user_model()

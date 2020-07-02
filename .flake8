@@ -1,4 +1,4 @@
 [flake8]
-exclude = .pytest_cache, *.egg-info
+exclude = .pytest_cache, *.egg-info, */migrations/*
 #ignore = E402
 max-line-length = 119
