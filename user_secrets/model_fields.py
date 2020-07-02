@@ -7,8 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from user_secrets.crypto import encrypt
-
+from user_secrets.crypto import user_encrypt
 
 UserModel = get_user_model()
 
@@ -64,21 +63,13 @@ class EncryptedField(models.CharField):
         return errors
 
     def save_form_data(self, instance, data):
-        encrypted_data = encrypt(
+        encrypted_data = user_encrypt(
             user=instance.user,
             data=data
         )
         return super().save_form_data(instance, encrypted_data)
 
-        raw_user_token = get_user_raw_user_token(user=user)
 
-        print(instance)
-        print(instance.user)
-        print(instance.encrypted_password)
-        print(self.attname)
-        encrypted_password = getattr(instance, self.attname)
-        print(encrypted_password)
-        raise
 
     # def from_db_value(self, value, expression, connection):
     #     if value is None:
