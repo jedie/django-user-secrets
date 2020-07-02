@@ -1,21 +1,19 @@
 import logging
 
-from user_secrets.crypto import fernet_from_password
+from user_secrets.crypto import secret2fernet_key
+from user_secrets.user_key import set_user_key
 
 
 log = logging.getLogger(__name__)
 
 
 class UserSecretsAuthBackend:
-    """
-    Generate the temporary Fernet() instance from the plain-text user password.
-    This will only exists in RAM and never saved persistent.
-    """
-
     def authenticate(self, request, username=None, password=None):
         if password and request:
-            fernet = fernet_from_password(raw_password=password)
-            request.fernet = fernet
-            log.debug(f'Add request.fernet="{fernet}"')
+            log.debug('create fernet key from password')
+            fernet_key = secret2fernet_key(secret=password)
+
+            # Save for: user_secrets.signals.user_logged_in_callback
+            set_user_key(fernet_key)
 
         return None

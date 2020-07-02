@@ -1,58 +1,22 @@
 import base64
 import logging
-import secrets
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from django.conf import settings
-from django.core.cache import caches
+from django.contrib.auth.hashers import get_random_string
 
-from user_secrets.constants import ENCRYPTED_SECRET_LENGTH
+from user_secrets.caches import get_user_itermediate_secret
+from user_secrets.constants import ITERMEDIATE_SECRET_LENGTH
+from user_secrets.exceptions import DecryptError, NoUserItermediateSecretError
 
 
 log = logging.getLogger(__name__)
 
 
-CACHE_PATTERN = 'raw_user_token_{user_pk}'
-
-
-class CryptoError(Exception):
-    pass
-
-
-def get_cache_key(user):
-    key = CACHE_PATTERN.format(user_pk=user.pk)
-    return key
-
-
-def set_user_raw_user_token(*, user, raw_user_token):
-    log.debug(f'Save raw_user_token to cache for user: {user.pk}')
-    cache = caches['user_secrets']
-    cache_key = get_cache_key(user=user)
-    cache.set(cache_key, raw_user_token)
-
-
-def get_user_raw_user_token(*, user):
-    log.debug(f'Get raw_user_token from cache for user: {user.pk}')
-    cache = caches['user_secrets']
-    cache_key = get_cache_key(user=user)
-    return cache.get(cache_key)
-
-
-def delete_user_raw_user_token(*, user):
-    log.debug(f'Delete raw_user_token from cache for user: {user.pk}')
-    cache = caches['user_secrets']
-    cache_key = get_cache_key(user=user)
-    cache.delete(cache_key)
-
-
-def fernet_from_password(*, raw_password):
-    """
-    Used on login to generate the temporary Fernet() instance
-    from the plain-text user password.
-    """
+def secret2fernet_key(*, secret):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
@@ -60,71 +24,60 @@ def fernet_from_password(*, raw_password):
         iterations=10000,
         backend=default_backend()
     )
-    key = base64.urlsafe_b64encode(kdf.derive(raw_password.encode('ASCII', errors='strict')))
-    fernet = Fernet(key)
-    log.debug(f'temporary Fernet() instance generated: {fernet}')
-    return fernet
+    key = base64.urlsafe_b64encode(kdf.derive(secret.encode('utf-8')))
+    return key
 
 
-def generate_raw_user_token():
-    raw_user_token = secrets.token_bytes(nbytes=ENCRYPTED_SECRET_LENGTH)
-    return raw_user_token
+class Cryptor:
+    def __init__(self, secret=None, fernet_key=None):
+        if secret is not None:
+            assert fernet_key is None
+            assert isinstance(secret, str)
+            self.fernet = self._secret2fernet(secret=secret)
+        else:
+            assert fernet_key is not None
+            assert isinstance(fernet_key, bytes)
+            self.fernet = Fernet(fernet_key)
+
+    def _secret2fernet(self, secret):
+        key = secret2fernet_key(secret=secret)
+        fernet = Fernet(key)
+        return fernet
+
+    def encrypt(self, *, data):
+        assert isinstance(data, str)
+        encrypted_data = self.fernet.encrypt(data.encode('utf-8'))
+        return encrypted_data.decode('ASCII', errors='strict')
+
+    def decrypt(self, *, encrypted_data):
+        assert isinstance(encrypted_data, str)
+        try:
+            data = self.fernet.decrypt(encrypted_data.encode('ASCII', errors='strict'))
+        except InvalidToken:
+            # e.g.: password change without update or SECRET_KEY changed?
+            log.error('Decrypt error: Invalid token!')
+            raise DecryptError()
+
+        return data.decode('utf-8')
 
 
-def fernet_encrypt(fernet, data):
-    """
-    Encrypt data via fernet and return the base64 result as a string (not bytes)
-    """
-    assert isinstance(fernet, Fernet)
-    assert isinstance(data, bytes)
-    encrypted_data = fernet.encrypt(data)  # URL-safe base64-encoded bytes
-    return encrypted_data.decode('ASCII', errors='strict')
+def generate_encrypted_secret(*, raw_password):
+    itermediate_secret = get_random_string(ITERMEDIATE_SECRET_LENGTH)
+    encrypted_itermediate_secret = Cryptor(secret=raw_password).encrypt(data=itermediate_secret)
+    return itermediate_secret, encrypted_itermediate_secret
 
 
-def fernet_decrypt(fernet, encrypted_data):
-    """
-    Decrypt data via fernet and return the base64 result as bytes
-    """
-    assert isinstance(fernet, Fernet)
-    if not isinstance(encrypted_data, bytes):
-        encrypted_data = encrypted_data.encode('ASCII', errors='strict')
-    raw_data = fernet.decrypt(encrypted_data)
-    return raw_data
+def user_encrypt(*, user, data):
+    itermediate_secret = get_user_itermediate_secret(user=user)
+    if itermediate_secret is None:
+        raise NoUserItermediateSecretError()
+
+    return Cryptor(secret=itermediate_secret).encrypt(data=data)
 
 
-def encrypt_user_raw_user_token(*, raw_user_token, raw_password):
-    """
-    Encrypt 'raw_user_token' with the plain-text user password.
-    """
-    assert isinstance(raw_user_token, bytes)
-    encrypted_secret = fernet_encrypt(
-        fernet=fernet_from_password(raw_password=raw_password),
-        data=raw_user_token
-    )
-    return encrypted_secret
+def user_decrypt(*, user, encrypted_data):
+    itermediate_secret = get_user_itermediate_secret(user=user)
+    if itermediate_secret is None:
+        raise NoUserItermediateSecretError()
 
-
-def decrypt_user_raw_user_token(*, encrypted_secret, raw_password):
-    """
-    Decrypt the "encrypted_secret" with the plain-text user password.
-    """
-    encrypted_secret = encrypted_secret.encode('ASCII', errors='strict')  # base64 string to bytes
-    fernet = fernet_from_password(raw_password=raw_password)
-    raw_user_token = fernet.decrypt(encrypted_secret)
-    return raw_user_token
-
-
-def encrypt(*, user, data):
-    """
-    Encrypt 'data' for the 'user'.
-    return the base64 result as a string (not bytes)
-    """
-    raw_user_token = get_user_raw_user_token(user=user)
-    if raw_user_token is None:
-        raise CryptoError('No raw_user_token')
-
-    assert isinstance(raw_user_token, bytes)
-    return fernet_encrypt(
-        fernet=Fernet(raw_user_token),
-        data=data,
-    )
+    return Cryptor(secret=itermediate_secret).decrypt(encrypted_data=encrypted_data)

@@ -1,0 +1,13 @@
+{% extends "demo/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<h1>DEMO</h1>
+<p>info:</p>
+{% if not itermediate_secret_length %}
+    <p>User itermediate secret is not set!</p>
+{% else %}
+    <p>User itermediate secret length: {{ itermediate_secret_length }} Bytes: {{ masked_secret }}</p>
+{% endif %}
+{% endblock %}
+

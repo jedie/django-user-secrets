@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).parent
 DEBUG = True
 INTERNAL_IPS = ['127.0.0.1']
 
-SECRET_KEY = 'Unittests'
+SECRET_KEY = 'This is not a secret! But this is only the DEMO ;)'
 ALLOWED_HOSTS = ['*']  # Allow any domain/subdomain
 
 DATABASES = {
@@ -127,6 +127,8 @@ assert str(MEDIA_ROOT).endswith('/user_secrets_tests/media')
 
 
 ROOT_URLCONF = 'user_secrets_tests.urls'
+
+LOGIN_URL = '/admin/login/'  # TODO: Build own login view
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',  # Speedup tests
