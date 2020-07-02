@@ -1,8 +1,10 @@
 class CryptoError(Exception):
     pass
 
+
 class DecryptError(CryptoError):
     pass
+
 
 class NoUserItermediateSecretError(CryptoError):
     pass

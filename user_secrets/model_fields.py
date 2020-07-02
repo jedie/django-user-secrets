@@ -1,13 +1,9 @@
-import time
-
 from django.contrib.auth import get_user_model
 from django.core import checks
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 
 from user_secrets.crypto import user_encrypt
+
 
 UserModel = get_user_model()
 
@@ -68,8 +64,6 @@ class EncryptedField(models.CharField):
             data=data
         )
         return super().save_form_data(instance, encrypted_data)
-
-
 
     # def from_db_value(self, value, expression, connection):
     #     if value is None:

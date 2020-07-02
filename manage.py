@@ -3,8 +3,6 @@
 import os
 import sys
 
-import user_secrets_tests
-
 
 def cli():
     # assert "DJANGO_SETTINGS_MODULE" not in os.environ, 'Do not set DJANGO_SETTINGS_MODULE !'
