@@ -14,21 +14,24 @@ def get_cache_key(user):
 
 
 def set_user_itermediate_secret(*, user, itermediate_secret):
-    log.debug(f'Save itermediate_secret to cache for user: {user.pk}')
+    log.debug(f'Save itermediate secret to cache for user: {user.pk}')
     cache = caches['user_secrets']
     cache_key = get_cache_key(user=user)
     cache.set(cache_key, itermediate_secret)
 
 
 def get_user_itermediate_secret(*, user):
-    log.debug(f'Get itermediate_secret from cache for user: {user.pk}')
+    log.debug(f'Get itermediate secret from cache for user: {user.pk}')
     cache = caches['user_secrets']
     cache_key = get_cache_key(user=user)
-    return cache.get(cache_key)
+    itermediate_secret = cache.get(cache_key)
+    if itermediate_secret is None:
+        log.debug(f'No itermediate secret from cache for user: {user.pk}')
+    return itermediate_secret
 
 
 def delete_user_itermediate_secret(*, user):
-    log.debug(f'Delete itermediate_secret from cache for user: {user.pk}')
+    log.debug(f'Delete itermediate secret from cache for user: {user.pk}')
     cache = caches['user_secrets']
     cache_key = get_cache_key(user=user)
     cache.delete(cache_key)
