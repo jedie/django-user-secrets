@@ -1,5 +1,8 @@
+import datetime
 import logging
+import time
 import unittest
+from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
@@ -11,6 +14,14 @@ from user_secrets.user_key import _KEY_STORAGE, del_user_key, get_user_key, set_
 
 
 UserModel = get_user_model()
+
+mock_dt = datetime.datetime(
+    year=2020, month=1, day=2,
+    hour=3, minute=4, second=5,
+    microsecond=0, tzinfo=None
+)
+mock_time = mock.Mock()
+mock_time.return_value = time.mktime(mock_dt.timetuple())
 
 
 class ClearKeyStorageMixin:
@@ -57,6 +68,24 @@ class CryptorTestCase(ClearKeyStorageMixin, unittest.TestCase):
 
         with self.assertRaises(NoUserKeyError):
             get_user_key()
+
+    def test_timestamp(self):
+        with mock.patch('time.time', mock_time):
+            # Test the mock:
+            mock_timestamp = 1577934245
+            is_timestamp = int(time.time())
+            assert is_timestamp == mock_timestamp
+            dt = datetime.datetime.fromtimestamp(is_timestamp)
+            assert dt.isoformat() == '2020-01-02T03:04:05'
+            assert dt == mock_dt
+
+            # Test timestamp functions:
+            c = Cryptor(secret='password')
+            encrypted_data = c.encrypt(data='test')
+            timestamp = c.extract_timestamp(encrypted_data=encrypted_data)
+            assert timestamp == mock_timestamp
+            extraced_dt = c.get_datetime(encrypted_data=encrypted_data)
+            assert extraced_dt.isoformat() == '2020-01-02T03:04:05+00:00'
 
 
 class CryptoTestCase(ClearKeyStorageMixin, TestCase):

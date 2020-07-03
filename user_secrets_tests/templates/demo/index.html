@@ -1,13 +1,27 @@
 {% extends "demo/base.html" %}
-{% load i18n static %}
+{% load i18n static admin_urls %}
 
 {% block content %}
 <h1>DEMO</h1>
-<p>info:</p>
 {% if not itermediate_secret_length %}
-    <p>User itermediate secret is not set!</p>
+    <p>info:</p>
+    <p>User itermediate secret is not set! Please logout/login again.</p>
 {% else %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+    <p>
+        <a href="{% url opts|admin_urlname:'change' instance.id %}">
+            Change this entry in Django Admin
+        </a>
+    </p>
+    <p>encrypted_password: {{ encrypted_password }}</p>
+    <p>Encrypt Timestamp: {{ token_dt }} ({{ token_dt|timesince }})</p>
     <p>User itermediate secret length: {{ itermediate_secret_length }} Bytes: {{ masked_secret }}</p>
 {% endif %}
 {% endblock %}
+
+
 
