@@ -17,6 +17,8 @@ class DemoView(TemplateView):
             masked_secret = mask_hash(hash=itermediate_secret, show=6, char="*")
 
         context.update({
+            'user': self.request.user,
+            'has_permission': True,  # enable '{% block usertools %}'
             'masked_secret': masked_secret,
             'itermediate_secret_length': itermediate_secret_length,
         })
