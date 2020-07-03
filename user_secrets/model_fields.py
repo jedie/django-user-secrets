@@ -64,17 +64,3 @@ class EncryptedField(models.CharField):
             data=data
         )
         return super().save_form_data(instance, encrypted_data)
-
-    # def from_db_value(self, value, expression, connection):
-    #     if value is None:
-    #         return value
-    #     return parse_hand(value)
-    #
-    # def to_python(self, value):
-    #     if isinstance(value, Hand):
-    #         return value
-    #
-    #     if value is None:
-    #         return value
-    #
-    #     return parse_hand(value)

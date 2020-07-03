@@ -1,4 +1,5 @@
 import base64
+import datetime
 import logging
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -7,6 +8,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from django.conf import settings
 from django.contrib.auth.hashers import get_random_string
+from django.utils import timezone
 
 from user_secrets.caches import get_user_itermediate_secret
 from user_secrets.constants import ITERMEDIATE_SECRET_LENGTH
@@ -60,6 +62,22 @@ class Cryptor:
 
         return data.decode('utf-8')
 
+    def extract_timestamp(self, *, encrypted_data):
+        assert isinstance(encrypted_data, str)
+        try:
+            return self.fernet.extract_timestamp(encrypted_data.encode('ASCII', errors='strict'))
+        except InvalidToken:
+            return
+
+    def get_datetime(self, *, encrypted_data):
+        timestamp = self.extract_timestamp(encrypted_data=encrypted_data)
+        if not timestamp:
+            return
+
+        tz = timezone.get_current_timezone()
+        dt = datetime.datetime.fromtimestamp(timestamp, tz=tz)
+        return dt
+
 
 def encrypt_itermediate_secret(*, itermediate_secret, raw_password):
     encrypted_itermediate_secret = Cryptor(secret=raw_password).encrypt(data=itermediate_secret)
@@ -78,6 +96,7 @@ def generate_encrypted_secret(*, raw_password):
 def user_encrypt(*, user, data):
     itermediate_secret = get_user_itermediate_secret(user=user)
     if itermediate_secret is None:
+        log.error('Itermediate secret missing for user: %s', user.pk)
         raise NoUserItermediateSecretError()
 
     return Cryptor(secret=itermediate_secret).encrypt(data=data)
@@ -86,6 +105,16 @@ def user_encrypt(*, user, data):
 def user_decrypt(*, user, encrypted_data):
     itermediate_secret = get_user_itermediate_secret(user=user)
     if itermediate_secret is None:
+        log.error('Itermediate secret missing for user: %s', user.pk)
         raise NoUserItermediateSecretError()
 
     return Cryptor(secret=itermediate_secret).decrypt(encrypted_data=encrypted_data)
+
+
+def user_get_datetime(*, user, encrypted_data):
+    itermediate_secret = get_user_itermediate_secret(user=user)
+    if itermediate_secret is None:
+        log.error('Itermediate secret missing for user: %s', user.pk)
+        return
+
+    return Cryptor(secret=itermediate_secret).get_datetime(encrypted_data=encrypted_data)

@@ -16,6 +16,8 @@
 
 {% block footer %}
 <div id="footer">
-    <a href="{% url 'admin:index' %}">{% trans 'Django site admin' %}</a>
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Django site admin' %}</a>
+    </div>
 </div>
 {% endblock %}
