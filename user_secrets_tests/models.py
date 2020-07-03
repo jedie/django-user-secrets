@@ -25,4 +25,3 @@ class ExampleModel(models.Model):
             self.encrypted_password = user_decrypt(user=user, encrypted_data=self.encrypted_password)
         except NoUserItermediateSecretError:
             pass
-
