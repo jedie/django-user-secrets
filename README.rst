@@ -4,7 +4,7 @@ django-user-secrets
 
 Store user secrets encrypted into database.
 
-Current project state: planing
+Current project state: "Pre-Alpha"
 
 Licence: GPL v3 or above
 
@@ -26,6 +26,51 @@ Limitations and/or facts:
 
 * A intermediate-user-secret is used, so that a password can be changed without losing the encrypted data.
 
+----
+DEMO
+----
+
+Prepare: `install poetry <https://python-poetry.org/docs/#installation>`_ e.g.:
+
+::
+
+    ~$ sudo apt install python3-pip
+    ~$ pip3 install -U pip --user
+    ~$ pip3 install -U poerty --user
+
+Clone the sources, e.g.:
+
+::
+
+    ~$ git clone https://github.com/jedie/django-user-secrets.git
+    ~$ cd django-user-secrets
+    
+    # install via poetry:
+    ~/django-user-secrets$ poetry install
+    
+    # Start Django dev. server:
+    ~/django-user-secrets$ poetry run dev_server
+
+You can also use our Makefile, e.g.:
+
+::
+
+    django-user-secrets$ make help
+    help                 List all commands
+    install-poetry       install or update poetry
+    install              install django-user-secrets via poetry
+    lint                 Run code formatters and linter
+    fix-code-style       Fix code formatting
+    tox-listenvs         List all tox test environments
+    tox                  Run pytest via tox with all environments
+    tox-py36             Run pytest via tox with *python v3.6*
+    tox-py37             Run pytest via tox with *python v3.7*
+    tox-py38             Run pytest via tox with *python v3.8*
+    pytest               Run pytest
+    update-rst-readme    update README.rst from README.creole
+    publish              Release new version to PyPi
+    start-dev-server     Start Django dev. server with the test project
+
 Alternative/Related projects:
 =============================
 
@@ -39,4 +84,4 @@ Alternative/Related projects:
 
 ------------
 
-``Note: this file is generated from README.creole 2020-06-11 19:44:56 with "python-creole"``
+``Note: this file is generated from README.creole 2020-07-03 10:18:29 with "python-creole"``
