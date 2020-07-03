@@ -61,9 +61,17 @@ class Cryptor:
         return data.decode('utf-8')
 
 
+def encrypt_itermediate_secret(*, itermediate_secret, raw_password):
+    encrypted_itermediate_secret = Cryptor(secret=raw_password).encrypt(data=itermediate_secret)
+    return encrypted_itermediate_secret
+
+
 def generate_encrypted_secret(*, raw_password):
     itermediate_secret = get_random_string(ITERMEDIATE_SECRET_LENGTH)
-    encrypted_itermediate_secret = Cryptor(secret=raw_password).encrypt(data=itermediate_secret)
+    encrypted_itermediate_secret = encrypt_itermediate_secret(
+        itermediate_secret=itermediate_secret,
+        raw_password=raw_password
+    )
     return itermediate_secret, encrypted_itermediate_secret
 
 
