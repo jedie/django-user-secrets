@@ -64,9 +64,7 @@ class DemoView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         itermediate_secret = get_user_itermediate_secret(user=request.user)
-        if itermediate_secret is None:
-            logout(request)
-            return HttpResponseRedirect('/')
+        assert itermediate_secret is not None  # UserSecretsMiddleware should prevent this
 
         instance = self.get_instance()
         form = ExampleModelForm(instance=instance)
