@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.auth import get_user_model, user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from user_secrets.caches import delete_user_itermediate_secret, set_user_itermediate_secret

@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth import logout
 from django.contrib.auth.views import LogoutView
 
 from user_secrets.caches import get_user_itermediate_secret
