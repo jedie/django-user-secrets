@@ -12,7 +12,9 @@ UserModel = get_user_model()
 class ExampleModel(models.Model):
     user = models.OneToOneField(
         UserModel,
-        on_delete=models.CASCADE
+        unique=True,
+        db_index=True,
+        on_delete=models.CASCADE,
     )
     encrypted_password = EncryptedField(
         max_length=256,
