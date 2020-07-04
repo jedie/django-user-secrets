@@ -4,7 +4,14 @@ django-user-secrets
 
 Store user secrets encrypted into database.
 
-Current project state: "Pre-Alpha"
++--------------------------+-------------------------------------------------+
+| |Build Status on github| | `github.com/jedie/django-user-secrets/actions`_ |
++--------------------------+-------------------------------------------------+
+
+.. |Build Status on github| image:: https://github.com/jedie/django-user-secrets/workflows/test/badge.svg?branch=master
+.. _github.com/jedie/django-user-secrets/actions: https://github.com/jedie/django-user-secrets/actions
+
+Current project state: "Alpha"
 
 Licence: GPL v3 or above
 
@@ -97,4 +104,4 @@ history
 
 ------------
 
-``Note: this file is generated from README.creole 2020-07-04 18:52:44 with "python-creole"``
+``Note: this file is generated from README.creole 2020-07-04 19:58:56 with "python-creole"``

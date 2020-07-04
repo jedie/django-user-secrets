@@ -2,7 +2,9 @@
 
 Store user secrets encrypted into database.
 
-Current project state: "Pre-Alpha"
+| {{https://github.com/jedie/django-user-secrets/workflows/test/badge.svg?branch=master|Build Status on github}} | [[https://github.com/jedie/django-user-secrets/actions|github.com/jedie/django-user-secrets/actions]] |
+
+Current project state: "Alpha"
 
 Licence: GPL v3 or above
 
