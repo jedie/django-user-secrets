@@ -51,13 +51,3 @@ def user_login_failed_callback(*, sender, credentials, request, **kwargs):
     if request:
         request.fernet = None
     print(sender, credentials, request)
-
-
-@receiver(post_save, sender=UserModel)
-def user_model_post_save_callback(sender, instance, created, **kwargs):
-    print("user_model_post_save_callback", sender, instance, created)
-
-
-@receiver(post_delete, sender=UserModel)
-def user_model_post_delete_callback(sender, **kwargs):
-    print("user_model_post_delete_callback", sender, kwargs)
