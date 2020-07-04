@@ -3,15 +3,20 @@
 
 {% block content %}
 <h1>DEMO</h1>
-{% if not itermediate_secret_length %}
+{% if not instance %}
+    <p>Please save something:</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+{% if not instance %}
     <p>info:</p>
-    <p>User itermediate secret is not set! Please logout/login again.</p>
+    <p>No example instance exists for current user</p>
 {% else %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Submit">
-    </form>
     <p>
         <a href="{% url opts|admin_urlname:'change' instance.id %}">
             Change this entry in Django Admin

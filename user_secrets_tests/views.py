@@ -2,7 +2,6 @@ import logging
 
 from django import forms
 from django.contrib import messages
-from django.contrib.auth import logout
 from django.contrib.auth.hashers import mask_hash
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
@@ -18,7 +17,10 @@ log = logging.getLogger(__name__)
 class ExampleModelForm(forms.ModelForm):
     class Meta:
         model = ExampleModel
-        fields = ['encrypted_password']
+        fields = ['user', 'encrypted_password']
+        widgets = {
+            'user': forms.widgets.Select(attrs={'disabled': 'disabled'}),
+        }
 
 
 class DemoView(TemplateView):
@@ -64,12 +66,10 @@ class DemoView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         itermediate_secret = get_user_itermediate_secret(user=request.user)
-        if itermediate_secret is None:
-            logout(request)
-            return HttpResponseRedirect('/')
+        assert itermediate_secret is not None  # UserSecretsMiddleware should prevent this
 
         instance = self.get_instance()
-        form = ExampleModelForm(instance=instance)
+        form = ExampleModelForm(instance=instance, initial={'user': request.user})
         context = {
             'form': form,
             'instance': instance,
@@ -77,7 +77,10 @@ class DemoView(TemplateView):
         return self.render_to_response(context)
 
     def post(self, request):
-        form = ExampleModelForm(self.request.POST, instance=self.get_instance())
+        data = self.request.POST.copy()
+        data['user'] = request.user
+
+        form = ExampleModelForm(data=data, instance=self.get_instance())
         if form.is_valid():
             if form.has_changed():
                 log.info('Change fields: %s', ', '.join(form.changed_data))

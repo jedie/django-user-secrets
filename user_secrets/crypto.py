@@ -63,6 +63,9 @@ class Cryptor:
         return data.decode('utf-8')
 
     def extract_timestamp(self, *, encrypted_data):
+        if encrypted_data is None:
+            return
+
         assert isinstance(encrypted_data, str)
         try:
             return self.fernet.extract_timestamp(encrypted_data.encode('ASCII', errors='strict'))

@@ -6,6 +6,9 @@ from user_secrets_tests.models import ExampleModel
 
 @admin.register(ExampleModel)
 class ExampleModelAdmin(admin.ModelAdmin):
+    list_display = ('user', 'encrypted_password')
+    list_display_links = ('encrypted_password', 'user')
+
     def _changeform_view(self, request, object_id, form_url, extra_context):
         itermediate_secret = get_user_itermediate_secret(user=request.user)
         if itermediate_secret is None:
