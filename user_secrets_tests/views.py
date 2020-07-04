@@ -1,6 +1,5 @@
 import logging
 
-from django import forms
 from django.contrib import messages
 from django.contrib.auth.hashers import mask_hash
 from django.http import HttpResponseRedirect
@@ -8,19 +7,11 @@ from django.views.generic import TemplateView
 
 from user_secrets.caches import get_user_itermediate_secret
 from user_secrets.crypto import user_get_datetime
+from user_secrets_tests.forms import ExampleModelForm
 from user_secrets_tests.models import ExampleModel
 
 
 log = logging.getLogger(__name__)
-
-
-class ExampleModelForm(forms.ModelForm):
-    class Meta:
-        model = ExampleModel
-        fields = ['user', 'encrypted_password']
-        widgets = {
-            'user': forms.widgets.Select(attrs={'disabled': 'disabled'}),
-        }
 
 
 class DemoView(TemplateView):
@@ -64,12 +55,17 @@ class DemoView(TemplateView):
         })
         return super().get_context_data(**context)
 
+    def get_form(self, request, obj=None, data=None):
+        form = ExampleModelForm(instance=obj, data=data)
+        form.set_user(user=request.user)
+        return form
+
     def get(self, request, *args, **kwargs):
         itermediate_secret = get_user_itermediate_secret(user=request.user)
         assert itermediate_secret is not None  # UserSecretsMiddleware should prevent this
 
         instance = self.get_instance()
-        form = ExampleModelForm(instance=instance, initial={'user': request.user})
+        form = self.get_form(request, obj=instance)
         context = {
             'form': form,
             'instance': instance,
@@ -77,10 +73,8 @@ class DemoView(TemplateView):
         return self.render_to_response(context)
 
     def post(self, request):
-        data = self.request.POST.copy()
-        data['user'] = request.user
-
-        form = ExampleModelForm(data=data, instance=self.get_instance())
+        instance = self.get_instance()
+        form = self.get_form(request, obj=instance, data=self.request.POST)
         if form.is_valid():
             if form.has_changed():
                 log.info('Change fields: %s', ', '.join(form.changed_data))
