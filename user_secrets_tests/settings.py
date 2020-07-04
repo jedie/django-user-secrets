@@ -144,7 +144,8 @@ MEDIA_ROOT = str(Path(BASE_DIR, 'media'))
 assert str(MEDIA_ROOT).endswith('/user_secrets_tests/media')
 
 
-LOGIN_URL = '/admin/login/'  # TODO: Build own login view
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/'
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',  # Speedup tests
