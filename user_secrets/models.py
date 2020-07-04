@@ -21,20 +21,19 @@ class UserSecrets(AbstractUser):
         log.debug('Set password for user: %s', self.pk)
         super().set_password(raw_password)
 
-        itermediate_secret = get_user_itermediate_secret(user=self)
-        if itermediate_secret:
-            log.info('Password change: Update encrypted secret for user: %s', self.pk)
-            self.encrypted_secret = encrypt_itermediate_secret(
-                itermediate_secret=itermediate_secret,
-                raw_password=raw_password
-            )
-        else:
-            if self.encrypted_secret is not None:
-                log.error('Use password change: All stored encrypted data lost!')
-                # TODO: Implement a own password change with re-encrypt existing data!
+        if self.encrypted_secret is not None:
+            itermediate_secret = get_user_itermediate_secret(user=self)
+            if itermediate_secret:
+                log.info('Password change: Update encrypted secret for user: %s', self.pk)
+                self.encrypted_secret = encrypt_itermediate_secret(
+                    itermediate_secret=itermediate_secret,
+                    raw_password=raw_password
+                )
             else:
-                log.info('Set generate encrypted secret for new user')
-
+                log.error('encrypted_secret set but itermediate_secret missing!')
+                return
+        else:
+            log.info('Set generate encrypted secret for new user')
             itermediate_secret, self.encrypted_secret = generate_encrypted_secret(
                 raw_password=raw_password
             )
