@@ -25,3 +25,6 @@ class ExampleModel(models.Model):
             self.encrypted_password = user_decrypt(user=user, encrypted_data=self.encrypted_password)
         except NoUserItermediateSecretError:
             pass
+
+    def __str__(self):
+        return f'ExampleModel entry for user: {self.user}'
