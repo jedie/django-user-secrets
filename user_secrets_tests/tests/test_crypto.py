@@ -97,8 +97,6 @@ class CryptoTestCase(ClearKeyStorageMixin, TestCase):
             test_user.set_password('A Password!')
         assert logs.output == [
             f'DEBUG:user_secrets.models:Set password for user: {test_user.pk}',
-            f'DEBUG:user_secrets.caches:Get itermediate secret from cache for user: {test_user.pk}',
-            f'DEBUG:user_secrets.caches:No itermediate secret from cache for user: {test_user.pk}',
             'INFO:user_secrets.models:Set generate encrypted secret for new user',
             f'DEBUG:user_secrets.caches:Save itermediate secret to cache for user: {test_user.pk}',
             f'DEBUG:user_secrets.models:New encrypted secret saved for user: {test_user.pk}',

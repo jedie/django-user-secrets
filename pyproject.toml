@@ -39,9 +39,9 @@ classifiers = [
 python = "^3.6"
 django = "*"
 cryptography = "*" # https://github.com/pyca/cryptography
-django-tools = "*"
 
 [tool.poetry.dev-dependencies]
+django-tools = "*"
 poetry-publish = "*"  # https://github.com/jedie/poetry-publish
 django-debug-toolbar = "*"
 tox = "*"
