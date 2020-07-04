@@ -8,21 +8,14 @@ from django_tools.unittest_utils.logging_utils import CutPathnameLogRecordFactor
 
 print('Use settings:', __file__)
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = Path(__file__).parent
 
-DEBUG = True
-INTERNAL_IPS = ['127.0.0.1']
+###############################################################################
+# Settings for django-user-secrets usage:
 
+
+# The SECRET_KEY should never changed after django-user-secrets are created!
 SECRET_KEY = 'This is not a secret! But this is only the DEMO ;)'
-ALLOWED_HOSTS = ['*']  # Allow any domain/subdomain
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(Path(BASE_DIR.parent, 'test_project_db.sqlite3')),
-    }
-}
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -41,21 +34,27 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
+
 AUTH_USER_MODEL = 'user_secrets.UserSecrets'
+
+
 AUTHENTICATION_BACKENDS = [
     'user_secrets.auth_backend.UserSecretsAuthBackend',  # Must be at first
     'django.contrib.auth.backends.ModelBackend'
 ]
+
+
 CACHES = {
-    'default': {
+    'default': {  # Can use any backend.
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'default',
     },
-    'user_secrets': {
+    'user_secrets': {  # Should be use the LocMemCache!
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'user_secrets',
     }
 }
+
 
 MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -67,6 +66,23 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+
+ROOT_URLCONF = 'user_secrets_tests.urls'
+
+
+###############################################################################
+# Following settings are not really relevant to django-user-secret!
+
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = Path(__file__).parent
+
+
+DEBUG = True
+
+
+INTERNAL_IPS = ['127.0.0.1']
 
 
 TEMPLATES = [
@@ -93,24 +109,26 @@ TEMPLATES = [
     }
 ]
 
+
+ALLOWED_HOSTS = ['*']  # Allow any domain/subdomain
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(Path(BASE_DIR.parent, 'test_project_db.sqlite3')),
+    }
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-# ==============================================================================
-
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
-# ==============================================================================
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -123,10 +141,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = str(Path(BASE_DIR, 'media'))
 assert str(MEDIA_ROOT).endswith('/user_secrets_tests/media')
 
-# ==============================================================================
-
-
-ROOT_URLCONF = 'user_secrets_tests.urls'
 
 LOGIN_URL = '/admin/login/'  # TODO: Build own login view
 
@@ -134,17 +148,20 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',  # Speedup tests
 )
 
-# _____________________________________________________________________________
+
+###############################################################################
+# setup logging
+
 
 # Adds 'cut_path' attribute on log record. So '%(cut_path)s' can be used in log formatter.
 # user_secrets.unittest_utils.logging_utils.CutPathnameLogRecordFactory
 logging.setLogRecordFactory(CutPathnameLogRecordFactory(max_length=50))
 
+
 # Filter warnings and pipe them to logging system:
 # user_secrets.unittest_utils.logging_utils.FilterAndLogWarnings
 warnings.showwarning = FilterAndLogWarnings()
 
-# -----------------------------------------------------------------------------
 
 LOGGING = {
     'version': 1,
