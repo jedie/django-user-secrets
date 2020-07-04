@@ -30,7 +30,7 @@ install: check-poetry ## install django-user-secrets via poetry
 
 update: check-poetry ## update the sources and installation
 	git fetch --all
-	git push origin master
+	git pull origin master
 	poetry update
 
 lint: ## Run code formatters and linter
