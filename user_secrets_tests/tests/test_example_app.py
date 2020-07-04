@@ -12,7 +12,7 @@ from user_secrets_tests.tests.test_crypto import ClearKeyStorageMixin
 UserModel = get_user_model()
 
 
-class AdminTestCase(ClearKeyStorageMixin, BaseTestCase):
+class ExampleAppTestCase(ClearKeyStorageMixin, BaseTestCase):
     def test(self):
         test_user = UserModel.objects.create(username='a user', is_staff=True, is_superuser=True)
         with self.assertLogs('user_secrets', level=logging.DEBUG) as logs:
@@ -27,62 +27,77 @@ class AdminTestCase(ClearKeyStorageMixin, BaseTestCase):
 
         itermediate_secret1 = get_user_itermediate_secret(user=test_user)
 
-        response = self.client.get('/admin/')
-        self.assertRedirects(response, expected_url='/admin/login/?next=%2Fadmin%2F')
+        response = self.client.get('/')
+        self.assertRedirects(response, expected_url='/admin/login/?next=%2F')
 
         delete_user_itermediate_secret(user=test_user)
         response = self.client.post(
-            path='/admin/login/?next=%2Fadmin%2F',
+            path='/admin/login/?next=%2F',
             data={
                 'username': 'a user',
                 'password': 'A Password!'
             }
         )
-        self.assertRedirects(response, expected_url='/admin/')
+        self.assertRedirects(response, expected_url='/')
 
         itermediate_secret2 = get_user_itermediate_secret(user=test_user)
         assert itermediate_secret2 == itermediate_secret1
 
-        response = self.client.get('/admin/user_secrets_tests/examplemodel/add/')
+        response = self.client.get('/')
         self.assertResponse(
             response=response,
             must_contain=(
-                '<title>Add example model | Django site admin</title>',
-                '<label class="required" for="id_user">User:</label>',
+                '<title>Django-User-Secrets DEMO</title>',
+                'Please save something:',
+
+                '<label for="id_user">User:</label>',
                 f'<option value="{test_user.pk}" selected>a user</option>',
-                '<label class="required" for="id_encrypted_password">Password:</label>',
+                '<label for="id_encrypted_password">Password:</label>',
+
+                'No example instance exists for current user',
             ),
             status_code=200,
-            template_name='admin/change_form.html',
+            template_name='demo/index.html',
             messages=None,
         )
 
         assert ExampleModel.objects.count() == 0
 
         response = self.client.post(
-            path='/admin/user_secrets_tests/examplemodel/add/',
+            path='/',
             data={'encrypted_password': 'Not a Secret?!?'}
         )
-        self.assertRedirects(response, expected_url='/admin/user_secrets_tests/examplemodel/')
+        self.assertRedirects(response, expected_url='/', fetch_redirect_response=False)
         assert ExampleModel.objects.count() == 1
         entry = ExampleModel.objects.first()
 
         the_secret = user_decrypt(user=test_user, encrypted_data=entry.encrypted_password)
         assert the_secret == 'Not a Secret?!?'
 
-        response = self.client.get(f'/admin/user_secrets_tests/examplemodel/{entry.pk}/change/')
+        response = self.client.get('/')
         self.assertResponse(
             response=response,
             must_contain=(
-                '<title>Change example model | Django site admin</title>',
-                '<label class="required" for="id_user">User:</label>',
+                '<title>Django-User-Secrets DEMO</title>',
+
+
+                '<label for="id_user">User:</label>',
                 f'<option value="{test_user.pk}" selected>a user</option>',
-                '<label class="required" for="id_encrypted_password">Password:</label>',
+                '<label for="id_encrypted_password">Password:</label>',
+
+                '<input type="text" name="encrypted_password" value="Not a Secret?!?"'
+                ' maxlength="256" required id="id_encrypted_password">',
+
+                f'/admin/user_secrets_tests/examplemodel/{entry.pk}/change/',  # link into
+                'encrypted_password:',
+                'Encrypt Timestamp:',
+                'User itermediate secret length: 128 Bytes:'
             ),
             must_not_contain=(
-                'Not a Secret?!?',  # the admin doesn't display the encrypted data
+                'Please save something',
+                'No example instance exists for current user',
             ),
             status_code=200,
-            template_name='admin/change_form.html',
-            messages=None,
+            template_name='demo/index.html',
+            messages=['Form saved, ok.'],
         )
