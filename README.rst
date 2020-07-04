@@ -55,10 +55,11 @@ You can also use our Makefile, e.g.:
 
 ::
 
-    django-user-secrets$ make help
+    ~/django-user-secrets$ make help
     help                 List all commands
     install-poetry       install or update poetry
     install              install django-user-secrets via poetry
+    update               update the sources and installation
     lint                 Run code formatters and linter
     fix-code-style       Fix code formatting
     tox-listenvs         List all tox test environments
@@ -84,4 +85,4 @@ Alternative/Related projects:
 
 ------------
 
-``Note: this file is generated from README.creole 2020-07-03 10:18:29 with "python-creole"``
+``Note: this file is generated from README.creole 2020-07-04 18:44:38 with "python-creole"``
