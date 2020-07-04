@@ -21,6 +21,7 @@ def user_logged_in_callback(*, sender, request, user, **kwargs):
     encrypted_secret = user.encrypted_secret
     if not encrypted_secret:
         log.info(f'No encrypted_secret for user {user.pk}')
+        delete_user_itermediate_secret(user=user)  # Maybe in cache exists outdated information!
         return
 
     # Set in UserSecretsAuthBackend.authenticate():
