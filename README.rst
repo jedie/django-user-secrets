@@ -83,6 +83,18 @@ Alternative/Related projects:
 
 (Random order: No prioritization)
 
+-------
+history
+-------
+
+* *dev* - `compare v0.1.0...master <https://github.com/jedie/django-user-secrets/compare/v0.1.0...master>`_
+
+* TBC
+
+* v0.1.0 - 04.07.2020 - `compare init...v0.1.0 <https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0>`_ 
+
+    * first release on PyPi
+
 ------------
 
-``Note: this file is generated from README.creole 2020-07-04 18:44:38 with "python-creole"``
+``Note: this file is generated from README.creole 2020-07-04 18:52:44 with "python-creole"``

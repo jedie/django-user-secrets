@@ -6,6 +6,7 @@ Current project state: "Pre-Alpha"
 
 Licence: GPL v3 or above
 
+
 == the idea
 
 Store a user's secrets in the database encrypted with his password.
@@ -19,6 +20,7 @@ Limitations and/or facts:
 * Only the same user can decrypt his own data.
 * The decrypted data can only be used during an active session.
 * A intermediate-user-secret is used, so that a password can be changed without losing the encrypted data.
+
 
 == DEMO
 
@@ -70,3 +72,11 @@ start-dev-server     Start Django dev. server with the test project
 * https://github.com/georgemarshall/django-cryptography
 
 (Random order: No prioritization)
+
+
+== history
+
+* *dev* - [[https://github.com/jedie/django-user-secrets/compare/v0.1.0...master|compare v0.1.0...master]]
+* TBC
+* v0.1.0 - 04.07.2020 - [[https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0|compare init...v0.1.0]]
+** first release on PyPi
