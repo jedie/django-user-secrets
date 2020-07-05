@@ -1,8 +1,14 @@
 from django.contrib import admin, messages
 
+from user_secrets.admin import UserSecretsAdmin
 from user_secrets.caches import get_user_itermediate_secret
 from user_secrets_tests.forms import set_form_user
-from user_secrets_tests.models import ExampleModel
+from user_secrets_tests.models import ExampleModel, UserSecretsModel
+
+
+@admin.register(UserSecretsModel)
+class ExampleModelAdmin(UserSecretsAdmin):
+    pass
 
 
 @admin.register(ExampleModel)
