@@ -1,18 +1,8 @@
-from django import forms
-
-from user_secrets_tests.models import ExampleModel
-
-
-def set_form_user(*, form, user, field_name='user'):
-    user_field = form.base_fields[field_name]
-    user_field.disabled = True  # always use initial value for this field
-    user_field.initial = user
+from user_secrets.forms import UserSecretsBaseModelModelForm
+from user_secrets_tests.models import UserSecretsModel
 
 
-class ExampleModelForm(forms.ModelForm):
-    def set_user(self, *, user):
-        set_form_user(form=self, user=user)
-
+class ExampleModelForm(UserSecretsBaseModelModelForm):
     class Meta:
-        model = ExampleModel
-        fields = ['user', 'encrypted_password']
+        model = UserSecretsModel
+        fields = ['example_secret']

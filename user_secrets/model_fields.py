@@ -1,65 +1,69 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.core import checks
 from django.db import models
 
-from user_secrets.crypto import user_encrypt
+from user_secrets.crypto import user_decrypt, user_encrypt
+
+
+log = logging.getLogger(__name__)
 
 
 class EncryptedField(models.CharField):
-    def __init__(self, user_field=None, **kwargs):
-        self.user_field = user_field
-        super().__init__(**kwargs)
+    def __init__(self, blank=None, null=None, **kwargs):
+        # blank and null should be set explicite to True in model definition!
+        # see also: self._check_instance()
+        self.blank = blank
+        self.null = null
+        super().__init__(blank=blank, null=null, **kwargs)
 
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
-            *self._check_user_field(),
+            *self._check_instance(**kwargs),
         ]
 
-    def _get_user_field(self):
-        meta_field = self.model._meta.get_field(self.user_field)
-        return meta_field
-
-    def _check_user_field(self):
+    def _check_instance(self, **kwargs):
         errors = []
-        if not self.user_field:
+
+        UserModel = get_user_model()
+        own_model = self.model
+        if own_model != UserModel:
             errors.append(
                 checks.Error(
-                    f"'user_field' is not defined for {self.__class__.__name__!r}.",
+                    'EncryptedField not used on the user model!',
                     obj=self,
                     id='fields.E201',
                 )
             )
-        else:
-            meta_field = self._get_user_field()
-            if not isinstance(meta_field, models.OneToOneField):
-                errors.append(
-                    checks.Error(
-                        f'Meta field {meta_field} for {self.__class__.__name__!r}'
-                        f' is not a OneToOneField',
-                        obj=self,
-                        id='fields.E201',
-                    )
-                )
-            related_model = meta_field.related_model
 
-            UserModel = get_user_model()
-            if related_model != UserModel:
-                errors.append(
-                    checks.Error(
-                        f'Meta field {meta_field}'
-                        f' must point to User model: {UserModel.__name__!r}!'
-                        f' (It points currently to: {related_model.__name__!r}',
-                        obj=self,
-                        id='fields.E201',
-                    )
+        if self.blank is not True or self.null is not True:
+            errors.append(
+                checks.Error(
+                    'EncryptedField must have "blank=True" and "null=True".',
+                    obj=self,
+                    id='fields.E202',
                 )
-
+            )
         return errors
 
+    def get_decrypted(self, instance):
+        attribute_name = self.get_attname()
+        encrypted_data = getattr(instance, attribute_name)
+        if not encrypted_data:
+            log.info('%s.%s is empty, ok.', self.model._meta.label, attribute_name)
+            return None
+
+        decrypted_data = user_decrypt(user=instance, encrypted_data=encrypted_data)
+        return decrypted_data
+
     def save_form_data(self, instance, data):
-        encrypted_data = user_encrypt(
-            user=instance.user,
-            data=data
-        )
+        if data is None:
+            encrypted_data = None
+        else:
+            encrypted_data = user_encrypt(
+                user=instance,
+                data=data
+            )
         return super().save_form_data(instance, encrypted_data)

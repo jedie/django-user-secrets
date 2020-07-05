@@ -1,29 +1,18 @@
-from django.contrib import admin, messages
+from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from user_secrets.admin import UserSecretsAdmin
-from user_secrets.caches import get_user_itermediate_secret
-from user_secrets_tests.forms import set_form_user
-from user_secrets_tests.models import ExampleModel, UserSecretsModel
+from user_secrets_tests.models import UserSecretsModel
 
 
 @admin.register(UserSecretsModel)
 class ExampleModelAdmin(UserSecretsAdmin):
-    pass
-
-
-@admin.register(ExampleModel)
-class ExampleModelAdmin(admin.ModelAdmin):
-    list_display = ('user', 'encrypted_password')
-    list_display_links = ('encrypted_password', 'user')
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj=obj, **kwargs)
-        set_form_user(form=form, user=request.user)
-        return form
-
-    def _changeform_view(self, request, object_id, form_url, extra_context):
-        itermediate_secret = get_user_itermediate_secret(user=request.user)
-        if itermediate_secret is None:
-            messages.warning(request, 'Raw user itermediate secret not set')
-
-        return super()._changeform_view(request, object_id, form_url, extra_context)
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('User Secrets'), {'fields': ('encrypted_secret', 'example_secret')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )

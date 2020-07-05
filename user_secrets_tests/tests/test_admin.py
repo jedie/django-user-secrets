@@ -4,8 +4,6 @@ from django.contrib.auth import get_user_model
 from django_tools.unittest_utils.unittest_base import BaseTestCase
 
 from user_secrets.caches import delete_user_itermediate_secret, get_user_itermediate_secret
-from user_secrets.crypto import user_decrypt
-from user_secrets_tests.models import ExampleModel
 from user_secrets_tests.tests.test_crypto import ClearKeyStorageMixin
 
 
@@ -25,6 +23,10 @@ class AdminTestCase(ClearKeyStorageMixin, BaseTestCase):
             f'DEBUG:user_secrets.models:New encrypted secret saved for user: {test_user.pk}',
         ]
 
+        test_user = UserModel.objects.get(pk=test_user.pk)
+        assert test_user.encrypted_secret is not None
+        assert test_user.example_secret is None
+
         itermediate_secret1 = get_user_itermediate_secret(user=test_user)
 
         response = self.client.get('/admin/')
@@ -43,41 +45,22 @@ class AdminTestCase(ClearKeyStorageMixin, BaseTestCase):
         itermediate_secret2 = get_user_itermediate_secret(user=test_user)
         assert itermediate_secret2 == itermediate_secret1
 
-        response = self.client.get('/admin/user_secrets_tests/examplemodel/add/')
+        response = self.client.get(
+            f'/admin/user_secrets_tests/usersecretsmodel/{test_user.pk}/change/'
+        )
         self.assertResponse(
             response=response,
             must_contain=(
-                '<title>Add example model | Django site admin</title>',
-                '<label class="required" for="id_user">User:</label>',
-                f'<option value="{test_user.pk}" selected>a user</option>',
-                '<label class="required" for="id_encrypted_password">Password:</label>',
-            ),
-            status_code=200,
-            template_name='admin/change_form.html',
-            messages=None,
-        )
+                '<title>Change user | Django site admin</title>',
 
-        assert ExampleModel.objects.count() == 0
+                ' value="a user"',  # <input name="username"...
 
-        response = self.client.post(
-            path='/admin/user_secrets_tests/examplemodel/add/',
-            data={'encrypted_password': 'Not a Secret?!?'}
-        )
-        self.assertRedirects(response, expected_url='/admin/user_secrets_tests/examplemodel/')
-        assert ExampleModel.objects.count() == 1
-        entry = ExampleModel.objects.first()
+                '<label>Encrypted secret:</label>',
+                f'<div class="readonly">{test_user.encrypted_secret}</div>',
 
-        the_secret = user_decrypt(user=test_user, encrypted_data=entry.encrypted_password)
-        assert the_secret == 'Not a Secret?!?'
-
-        response = self.client.get(f'/admin/user_secrets_tests/examplemodel/{entry.pk}/change/')
-        self.assertResponse(
-            response=response,
-            must_contain=(
-                '<title>Change example model | Django site admin</title>',
-                '<label class="required" for="id_user">User:</label>',
-                f'<option value="{test_user.pk}" selected>a user</option>',
-                '<label class="required" for="id_encrypted_password">Password:</label>',
+                # Empty, yet:
+                '<input type="text" name="example_secret" class="vTextField"'
+                ' maxlength="256" id="id_example_secret">'
             ),
             must_not_contain=(
                 'Not a Secret?!?',  # the admin doesn't display the encrypted data
@@ -86,3 +69,31 @@ class AdminTestCase(ClearKeyStorageMixin, BaseTestCase):
             template_name='admin/change_form.html',
             messages=None,
         )
+
+        response = self.client.post(
+            path=f'/admin/user_secrets_tests/usersecretsmodel/{test_user.pk}/change/',
+            data={
+                'username': 'NewUsername',
+                'example_secret': 'A Test Secret!',
+                'first_name': '',
+                'last_name': '',
+                'email': '',
+                'is_active': 'on',
+                'is_staff': 'on',
+                'is_superuser': 'on',
+                'last_login_0': '2020-07-06',
+                'last_login_1': '07:52:06',
+                'date_joined_0': '2020-07-06',
+                'date_joined_1': '07:36:20',
+                'initial-date_joined_0': '2020-07-06',
+                'initial-date_joined_1': '07:36:20',
+                '_save': 'Save',
+            },
+        )
+        self.assertRedirects(response, expected_url='/admin/user_secrets_tests/usersecretsmodel/')
+
+        test_user = UserModel.objects.get(pk=test_user.pk)
+        assert test_user.encrypted_secret is not None
+        assert test_user.example_secret is not None
+
+        assert test_user.decrypted_example_secret() == 'A Test Secret!'
