@@ -1,17 +1,21 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from user_secrets.crypto import user_decrypt
 from user_secrets.exceptions import NoUserItermediateSecretError
 from user_secrets.model_fields import EncryptedField
+from user_secrets.models import AbstractUserSecretsModel
 
 
-UserModel = get_user_model()
+class UserSecretsModel(AbstractUserSecretsModel):
+    class Meta:
+        verbose_name = AbstractUser.Meta.verbose_name
+        verbose_name_plural = AbstractUser.Meta.verbose_name_plural
 
 
 class ExampleModel(models.Model):
     user = models.OneToOneField(
-        UserModel,
+        UserSecretsModel,
         unique=True,
         db_index=True,
         on_delete=models.CASCADE,

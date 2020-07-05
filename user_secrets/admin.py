@@ -1,12 +1,8 @@
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as OriginUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from user_secrets.models import UserSecrets
 
-
-@admin.register(UserSecrets)
-class UserAdmin(OriginUserAdmin):
+class UserSecretsAdmin(OriginUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password', 'encrypted_secret')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),

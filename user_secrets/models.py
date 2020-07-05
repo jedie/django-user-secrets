@@ -10,7 +10,7 @@ from user_secrets.crypto import encrypt_itermediate_secret, generate_encrypted_s
 log = logging.getLogger(__name__)
 
 
-class UserSecrets(AbstractUser):
+class AbstractUserSecretsModel(AbstractUser):
     encrypted_secret = models.CharField(
         max_length=256,
         null=True,
@@ -47,3 +47,8 @@ class UserSecrets(AbstractUser):
             self.save(update_fields=('password', 'encrypted_secret',))
 
         log.debug('New encrypted secret saved for user: %s', self.pk)
+
+    class Meta:
+        verbose_name = AbstractUser.Meta.verbose_name
+        verbose_name_plural = AbstractUser.Meta.verbose_name_plural
+        abstract = True
