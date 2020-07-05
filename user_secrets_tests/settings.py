@@ -34,8 +34,9 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
-
-AUTH_USER_MODEL = 'user_secrets.UserSecrets'
+# Must point to a own UserModel class
+# This class must inherit from user_secrets.models.AbstractUserSecretsModel
+AUTH_USER_MODEL = 'user_secrets_tests.UserSecretsModel'
 
 
 AUTHENTICATION_BACKENDS = [

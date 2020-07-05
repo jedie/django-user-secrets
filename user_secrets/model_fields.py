@@ -5,9 +5,6 @@ from django.db import models
 from user_secrets.crypto import user_encrypt
 
 
-UserModel = get_user_model()
-
-
 class EncryptedField(models.CharField):
     def __init__(self, user_field=None, **kwargs):
         self.user_field = user_field
@@ -45,6 +42,8 @@ class EncryptedField(models.CharField):
                     )
                 )
             related_model = meta_field.related_model
+
+            UserModel = get_user_model()
             if related_model != UserModel:
                 errors.append(
                     checks.Error(
