@@ -41,7 +41,7 @@ lint: ## Run code formatters and linter
 fix-code-style: ## Fix code formatting
 	poetry run flynt --line_length=${MAX_LINE_LENGTH} .
 	poetry run pyupgrade --exit-zero-even-if-changed --py3-plus --py36-plus --py37-plus `find . -name "*.py" -type f`
-	poetry run isort --atomic .
+	poetry run isort .
 	poetry run autopep8 --aggressive --aggressive --in-place --recursive .
 
 tox-listenvs: check-poetry ## List all tox test environments
