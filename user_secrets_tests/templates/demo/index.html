@@ -3,7 +3,7 @@
 
 {% block content %}
 <h1>DEMO</h1>
-{% if not instance %}
+{% if not example_secret %}
     <p>Please save something:</p>
 {% endif %}
 
@@ -22,8 +22,8 @@
             Change this entry in Django Admin
         </a>
     </p>
-    <p>encrypted_password: {{ encrypted_password }}</p>
-    <p>Encrypt Timestamp: {{ token_dt }} ({{ token_dt|timesince }})</p>
+    <p>example secret: {{ example_secret|default:"(nothing saved, yet.)" }}</p>
+    <p>Encrypt Timestamp: {% if token_dt %}{{ token_dt }} ({{ token_dt|timesince }}){% else %}-{% endif %}</p>
     <p>User itermediate secret length: {{ itermediate_secret_length }} Bytes: {{ masked_secret }}</p>
 {% endif %}
 {% endblock %}
