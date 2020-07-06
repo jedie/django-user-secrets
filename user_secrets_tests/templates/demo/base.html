@@ -14,10 +14,4 @@
 </div>
 {% endblock %}
 
-{% block footer %}
-<div id="footer">
-    <div class="breadcrumbs">
-        <a href="{% url 'admin:index' %}">{% trans 'Django site admin' %}</a>
-    </div>
-</div>
-{% endblock %}
+{% block footer %}{% include "demo/footer.html" %}{% endblock %}

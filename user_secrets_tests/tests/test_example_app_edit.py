@@ -10,7 +10,10 @@ from user_secrets_tests.tests.test_crypto import ClearKeyStorageMixin
 UserModel = get_user_model()
 
 
-class ExampleAppTestCase(ClearKeyStorageMixin, BaseTestCase):
+class ExampleAppEditTestCase(ClearKeyStorageMixin, BaseTestCase):
+    """
+    Tests for: user_secrets_tests.views.edit.EditExampleSecretView
+    """
     def test(self):
         test_user = UserModel.objects.create(username='a user', is_staff=True, is_superuser=True)
         with self.assertLogs('user_secrets', level=logging.DEBUG) as logs:
@@ -57,7 +60,7 @@ class ExampleAppTestCase(ClearKeyStorageMixin, BaseTestCase):
                 '<p>example secret: (nothing saved, yet.)</p>',
             ),
             status_code=200,
-            template_name='demo/index.html',
+            template_name='demo/edit_example_secret.html',
             messages=None,
         )
 
@@ -90,6 +93,6 @@ class ExampleAppTestCase(ClearKeyStorageMixin, BaseTestCase):
                 'nothing saved, yet.',
             ),
             status_code=200,
-            template_name='demo/index.html',
+            template_name='demo/edit_example_secret.html',
             messages=['Secret saved encrypted, ok.'],
         )

@@ -8,12 +8,4 @@
 
 {% block nav-global %}{% endblock %}
 
-{% block footer %}
-    <div id="footer">
-        {% if user.is_authenticated %}
-            <div class="breadcrumbs">
-            <a href="/">go to DEMO</a>
-            </div>
-        {% endif %}
-    </div>
-{% endblock %}
+{% block footer %}{% include "demo/footer.html" %}{% endblock %}
