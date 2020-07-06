@@ -79,6 +79,10 @@ start-dev-server     Start Django dev. server with the test project
 == history
 
 * *dev* - [[https://github.com/jedie/django-user-secrets/compare/v0.1.0...master|compare v0.1.0...master]]
+** refactor:
+*** Move EncryptedFields into user model and don't use a extra model for them
+*** Move code parts from demo app into main package
+** Bugfix Makefile
 * TBC
 * v0.1.0 - 04.07.2020 - [[https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0|compare init...v0.1.0]]
 ** first release on PyPi
