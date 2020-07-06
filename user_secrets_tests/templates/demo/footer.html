@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div id="footer">
+    {% if not user.is_authenticated %}
+        Please log in!
+    {% else %}
+        <div class="breadcrumbs">
+            go to:
+            <a href="{% url 'admin:index' %}">{% trans 'Django site admin' %}</a>
+            |
+            <a href="/">edit example secret</a>
+            |
+            <a href="/demo/">display example secret</a>
+        </div>
+    {% endif %}
+</div>

@@ -14,8 +14,8 @@ from user_secrets_tests.models import UserSecretsModel
 log = logging.getLogger(__name__)
 
 
-class DemoView(TemplateView):
-    template_name = 'demo/index.html'
+class EditExampleSecretView(TemplateView):
+    template_name = 'demo/edit_example_secret.html'
 
     def get_context_data(self, **context):
         user = self.request.user
