@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-user-secrets"
-version = "0.1.0"
+version = "0.2.0"
 description = "Store user secrets encrypted into database."
 
 # Will be generated from README.creole with: "poetry run update_rst_readme"
@@ -16,8 +16,7 @@ packages = [
 ]
 classifiers = [
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    "Development Status :: 3 - Alpha",
-#    "Development Status :: 4 - Beta",
+    "Development Status :: 4 - Beta",
 #    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",

@@ -4,7 +4,7 @@ Store user secrets encrypted into database.
 
 | {{https://github.com/jedie/django-user-secrets/workflows/test/badge.svg?branch=master|Build Status on github}} | [[https://github.com/jedie/django-user-secrets/actions|github.com/jedie/django-user-secrets/actions]] |
 
-Current project state: "Alpha"
+Current project state: "Beta"
 
 Licence: GPL v3 or above
 
@@ -184,11 +184,14 @@ start-dev-server     Start Django dev. server with the test project
 
 == history
 
-* *dev* - [[https://github.com/jedie/django-user-secrets/compare/v0.1.0...master|compare v0.1.0...master]]
+* [[https://github.com/jedie/django-user-secrets/compare/v0.2.0...master|*dev*]]
+** TBC
+* [[https://github.com/jedie/django-user-secrets/compare/v0.1.0...v0.2.0|v0.2.0 - 06.07.2020]]
 ** refactor:
 *** Move EncryptedFields into user model and don't use a extra model for them
 *** Move code parts from demo app into main package
+** Update demo app
+** update README
 ** Bugfix Makefile
-* TBC
-* v0.1.0 - 04.07.2020 - [[https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0|compare init...v0.1.0]]
+* [[https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0|v0.1.0 - 04.07.2020]]
 ** first release on PyPi

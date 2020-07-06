@@ -14,6 +14,7 @@ class ExampleAppEditTestCase(ClearKeyStorageMixin, BaseTestCase):
     """
     Tests for: user_secrets_tests.views.edit.EditExampleSecretView
     """
+
     def test(self):
         test_user = UserModel.objects.create(username='a user', is_staff=True, is_superuser=True)
         with self.assertLogs('user_secrets', level=logging.DEBUG) as logs:

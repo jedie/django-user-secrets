@@ -11,7 +11,7 @@ Store user secrets encrypted into database.
 .. |Build Status on github| image:: https://github.com/jedie/django-user-secrets/workflows/test/badge.svg?branch=master
 .. _github.com/jedie/django-user-secrets/actions: https://github.com/jedie/django-user-secrets/actions
 
-Current project state: "Alpha"
+Current project state: "Beta"
 
 Licence: GPL v3 or above
 
@@ -32,6 +32,116 @@ Limitations and/or facts:
 * The decrypted data can only be used during an active session.
 
 * A intermediate-user-secret is used, so that a password can be changed without losing the encrypted data.
+
+-----
+usage
+-----
+
+The encrypted user secrets are stored via ``EncryptedField`` in the user model. Your project must implement a own ``settings.AUTH_USER_MODEL`` inherith from ``AbstractUserSecretsModel`` e.g.:
+
+`/your_project/your_app/models.py <https://github.com/jedie/django-user-secrets/edit/master/user_secrets_tests/models.py>`_
+
+::
+
+    from user_secrets.model_fields import EncryptedField
+    from user_secrets.models import AbstractUserSecretsModel
+    
+    class UserSecretsModel(AbstractUserSecretsModel):
+        example_secret = EncryptedField(max_length=256, blank=True, null=True)  # can have one or more EncryptedField's!
+
+Add this own user model to the Django Admin and add the own ``EncryptedField``, so the user can fill it in the admin, e.g.:
+
+`/your_project/your_app/admin.py <https://github.com/jedie/django-user-secrets/edit/master/user_secrets_tests/admin.py>`_
+
+::
+
+    from django.contrib import admin
+    from django.utils.translation import gettext_lazy as _
+    
+    from user_secrets.admin import UserSecretsAdmin
+    from user_secrets_tests.models import UserSecretsModel
+    
+    
+    @admin.register(UserSecretsModel)
+    class ExampleModelAdmin(UserSecretsAdmin):
+        fieldsets = (
+            (None, {'fields': ('username', 'password')}),
+            (_('User Secrets'), {'fields': ('encrypted_secret', 'example_secret')}),  # <<< own fields
+            (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+            (_('Permissions'), {
+                'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            }),
+            (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        )
+
+It's also possible to implement a own "edit" view just for the ``EncryptedField`` values. Have a look at the demo app view: `/user_secrets_tests/views/edit.py <https://github.com/jedie/django-user-secrets/blob/master/user_secrets_tests/views/edit.py>`_
+For this you can easy get `a model form <https://github.com/jedie/django-user-secrets/blob/master/user_secrets_tests/forms.py>`_, e.g.:
+
+::
+
+    from user_secrets.forms import UserSecretsBaseModelModelForm
+    from user_secrets_tests.models import UserSecretsModel
+    
+    
+    class ExampleModelForm(UserSecretsBaseModelModelForm):
+        class Meta:
+            model = UserSecretsModel
+            fields = ['example_secret']
+
+To use the stored secret in a view, e.g.:
+
+::
+
+    user = request.user  # get current user
+    example_secret = user.example_secret  # the the example field value (encrypted)
+    # decrypt the example
+    decrypted_value = user_decrypt(user=user, encrypted_data=example_secret)
+    # ...do something with the value...
+
+Complete example is: `/user_secrets_tests/views/display.py <https://github.com/jedie/django-user-secrets/blob/master/user_secrets_tests/views/display.py>`_
+
+Needed settings:
+
+::
+
+    # The SECRET_KEY should never changed after django-user-secrets are created!
+    SECRET_KEY = 'Use a long random string and keep this value secret!'
+    
+    INSTALLED_APPS = (
+        #...
+        'user_secrets.apps.UserSecretsConfig',
+        #...
+    )
+    
+    # Must point to a own UserModel class
+    # This class must inherit from user_secrets.models.AbstractUserSecretsModel
+    AUTH_USER_MODEL = 'your_app.YourUserModel'
+    
+    
+    AUTHENTICATION_BACKENDS = [
+        'user_secrets.auth_backend.UserSecretsAuthBackend',  # Must be at first
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    
+    
+    CACHES = {
+        'default': {  # Can use any backend.
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'default',
+        },
+        'user_secrets': {  # Should be use the LocMemCache!
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'user_secrets',
+        }
+    }
+    
+    
+    MIDDLEWARE = (
+        #...
+        'user_secrets.middleware.UserSecretsMiddleware',  # inserted after AuthenticationMiddleware
+    )
+
+Complete example is: `/user_secrets_tests/settings.py <https://github.com/jedie/django-user-secrets/blob/master/user_secrets_tests/settings.py>`_
 
 ----
 DEMO
@@ -94,14 +204,28 @@ Alternative/Related projects:
 history
 -------
 
-* *dev* - `compare v0.1.0...master <https://github.com/jedie/django-user-secrets/compare/v0.1.0...master>`_
+* `*dev* <https://github.com/jedie/django-user-secrets/compare/v0.2.0...master>`_ 
 
-* TBC
+    * TBC
 
-* v0.1.0 - 04.07.2020 - `compare init...v0.1.0 <https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0>`_ 
+* `v0.2.0 - 06.07.2020 <https://github.com/jedie/django-user-secrets/compare/v0.1.0...v0.2.0>`_ 
+
+    * refactor:
+
+        * Move EncryptedFields into user model and don't use a extra model for them
+
+        * Move code parts from demo app into main package
+
+    * Update demo app
+
+    * update README
+
+    * Bugfix Makefile
+
+* `v0.1.0 - 04.07.2020 <https://github.com/jedie/django-user-secrets/compare/d5700b952...v0.1.0>`_ 
 
     * first release on PyPi
 
 ------------
 
-``Note: this file is generated from README.creole 2020-07-04 19:58:56 with "python-creole"``
+``Note: this file is generated from README.creole 2020-07-06 11:30:39 with "python-creole"``
